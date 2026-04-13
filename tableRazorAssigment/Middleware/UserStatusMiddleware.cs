@@ -30,17 +30,16 @@ public class UserStatusMiddleware
         if (user is not null)
             return;
         await context.SignOutAsync(IdentityConstants.ApplicationScheme);
-        context.Response.Redirect("/Account/Login");
+        context.Response.Redirect("/Index");
     }
 
-    private async Task UpdateLastSeen(User? user, HttpContext context, ApplicationDbContext dbContext)
+    private async Task UpdateLastSeen(User? user, UserManager<User> userManager)
     {
         if (user is null)
             return;
         var now = DateTime.UtcNow;
         user.LastSeen = now;
-        dbContext.Users.Update(user);
-        await dbContext.SaveChangesAsync();
+        await userManager.UpdateAsync(user);
         return;
     }
 
@@ -52,13 +51,22 @@ public class UserStatusMiddleware
             await _next(context);
             return;
         }
-        using var scope = serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        var user = await dbContext.Users.FindAsync(userId);
-        await LogOutDeletedUser(user, context);
-        await UpdateLastSeen(user, context, dbContext);
+        await ScopeActionsAsync(userId, context, serviceProvider);
         await _next(context);
+    }
+
+    private async Task ScopeActionsAsync(string userId, HttpContext context, IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        await UpdateUserAsync(userId, userManager, context);
+    }
+
+    private async Task UpdateUserAsync(string userId, UserManager<User> userManager, HttpContext context)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        await LogOutDeletedUser(user, context);
+        await UpdateLastSeen(user, userManager);
     }
 
 }

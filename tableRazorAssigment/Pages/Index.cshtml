@@ -1,10 +1,25 @@
 ﻿@page
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+
+@if (SignInManager.IsSignedIn(User))
+{
+
+    @section Scripts {
+        <script src="Index.cshtml.js"></script>
+    }
+}
+else
+{
+    <div class="">
+        <h1 class="">Welcome</h1>
+        <p>To use web application please log in</p>
+    </div>
+}

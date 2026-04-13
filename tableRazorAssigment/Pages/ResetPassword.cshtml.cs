@@ -8,7 +8,7 @@ using tableRazorAssigment.Services;
 
 namespace tableRazorAssigment.Pages;
 
-public class ResetPasswordModel : GuestOnlyPage
+public class ResetPasswordModel : PageModel
 {
     private readonly CustomSignInManager _signInManager;
     private readonly UserManager<User> _userManager;
@@ -32,7 +32,7 @@ public class ResetPasswordModel : GuestOnlyPage
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "Passwords doesn't match")]
+        [Compare("NewPassword", ErrorMessage = "Passwords doesn't match")]
         [MaxLength(256)]
         public string ConfirmPassword { get; set; }
     }
@@ -45,24 +45,8 @@ public class ResetPasswordModel : GuestOnlyPage
 
     public async Task<IActionResult> OnGet(string? userId, string? code)
     {
-        if (User.Identity is not null && User.Identity.IsAuthenticated)
+       if (IsRequestValid(userId, code) == false || IsRequestValid(userId, code) == false)
             return RedirectToPage("Index");
-        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(code))
-            return RedirectToPage("Index");
-
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user is null)
-            return RedirectToPage("Index");
-
-        var isValid = await _userManager.VerifyUserTokenAsync(
-              user,
-              _userManager.Options.Tokens.PasswordResetTokenProvider,
-              "ResetPassword",
-              code
-          );
-        if (!isValid)
-            return RedirectToPage("Index");
-
         Input = new InputModel
         {
             UserId = userId,
@@ -71,27 +55,66 @@ public class ResetPasswordModel : GuestOnlyPage
         return Page();
     }
 
+    private async Task<bool> IsUserTokenValid(string userId, string code)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return false;
+        var isValid = await _userManager.VerifyUserTokenAsync(
+             user,
+             _userManager.Options.Tokens.PasswordResetTokenProvider,
+             "ResetPassword",
+             code
+         );
+        return isValid;
+    }
+
+    private bool IsRequestValid(string? userId, string? code)
+    {
+        if (User.Identity is not null && User.Identity.IsAuthenticated)
+            return false;
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(code))
+            return false;
+        return true;
+    }
+
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
-
             return Page();
-        var user = await _userManager.FindByIdAsync(Input.UserId);
-        if (user is null)
+        var result = await ResetUserPassword();
+        if (result is not null && result.Succeeded)
             return RedirectToPage("Index");
+        AddErrorsToView(result);
+        return Page();
+    }
 
-        var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.NewPassword);
-
-        if (result.Succeeded)
-        {
-            await _signInManager.CustomPasswordSignInAsync(user.Email, Input.NewPassword, true, false);
-            return RedirectToPage("Index");
-
-        }
+    private void AddErrorsToView(IdentityResult? result)
+    {
+        if (result is null)
+            return;
         foreach (var error in result.Errors)
         {
             ModelState.AddModelError(string.Empty, error.Description);
         }
-        return Page();
     }
+
+    private async Task<IdentityResult?> ResetUserPassword()
+    {
+        var user = await _userManager.FindByIdAsync(Input.UserId);
+        if (user is null)
+            return null;
+        var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.NewPassword);
+        await OnSuccessResult(result, user);
+        return result;
+    }
+
+    private async Task OnSuccessResult(IdentityResult? result, User user)
+    {
+        if (result is not null && result.Succeeded)
+        {
+            await _signInManager.CustomPasswordSignInAsync(user.Email, Input.NewPassword, true, false);
+        }
+    }
+
 }

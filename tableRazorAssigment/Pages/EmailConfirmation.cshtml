@@ -1,0 +1,12 @@
+﻿@page
+@model tableRazorAssigment.Pages.EmailConfirmationModel
+@{
+}
+@if (ViewData["Error"] is not null)
+{
+    <p class="text-danger">ViewData["Error"]</p>
+}
+else
+{
+    <p>Your email confirmed</p>
+}

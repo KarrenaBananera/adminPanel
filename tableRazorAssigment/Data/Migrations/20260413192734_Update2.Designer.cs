@@ -12,8 +12,8 @@ using tableRazorAssigment.Data;
 namespace tableRazorAssigment.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260412202535_LastSeen2")]
-    partial class LastSeen2
+    [Migration("20260413192734_Update2")]
+    partial class Update2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,6 +177,12 @@ namespace tableRazorAssigment.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsUserBlocked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUserEmailConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastSeen")
                         .HasColumnType("datetime2");
 
@@ -185,6 +191,11 @@ namespace tableRazorAssigment.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(260)
+                        .HasColumnType("nvarchar(260)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -205,9 +216,6 @@ namespace tableRazorAssigment.Data.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
 
                     b.Property<string>("Title")
                         .HasMaxLength(260)

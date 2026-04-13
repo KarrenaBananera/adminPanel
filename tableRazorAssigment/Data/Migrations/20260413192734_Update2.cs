@@ -1,28 +1,29 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace tableRazorAssigment.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class LastSeen : Migration
+    public partial class Update2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
-                name: "LastSeen",
+            migrationBuilder.AddColumn<string>(
+                name: "Name",
                 table: "AspNetUsers",
-                type: "datetime2",
-                nullable: true);
+                type: "nvarchar(260)",
+                maxLength: 260,
+                nullable: false,
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "LastSeen",
+                name: "Name",
                 table: "AspNetUsers");
         }
     }

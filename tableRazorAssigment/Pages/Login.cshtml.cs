@@ -45,17 +45,23 @@ public class LoginModel : GuestOnlyPage
     {
         if (!ModelState.IsValid)
             return Page();
-
         var result = await _signInManager.CustomPasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
-        if (result.Succeeded)
+        if (result is not null && result.Succeeded)
             return RedirectToPage("Index");
-        else if (result.IsBlocked)
+        AddModelErrors(result);
+        return Page();
+    }
+
+    private void AddModelErrors(CustomSignInResult? result)
+    {
+        if (result is null)
+            return;
+        if (result.IsBlocked)
             ModelState.AddModelError(string.Empty, "User blocked");
         else if (result.IsLockedOut)
             ModelState.AddModelError(string.Empty, "Too many login attempts");
         else
             ModelState.AddModelError(string.Empty, "Incorrect email or password");
-
-        return Page();
     }
+
 }

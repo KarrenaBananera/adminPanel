@@ -20,6 +20,9 @@ public class ApplicationDbContext : IdentityDbContext<User>
           .Property(x => x.Title)
           .HasMaxLength(260);
         builder.Entity<User>()
+          .Property(x => x.Name)
+          .HasMaxLength(260);
+        builder.Entity<User>()
         .HasIndex(x => x.UserEmail)
         .IsUnique();
     }

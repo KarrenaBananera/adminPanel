@@ -36,32 +36,32 @@ public class ForgotPasswordModel : GuestOnlyPage
         if (!ModelState.IsValid)
             return Page();
         ViewData["SuccessMessage"] = $"Recovery link was send on your email.";
-        var user = await GetValidUser();
+        var user = await GetValidUserAsync();
         if (user is not null)
             await SendRecoveryEmail(user);
         return Page();
     }
 
-    private async Task<User?> GetValidUser()
+    private async Task<User?> GetValidUserAsync()
     {
         var user = await _userManager.FindByEmailAsync(Input.Email);
-        if (user == null || user.Status == UserStatus.Unverified)
+        if (user == null || user.IsUserEmailConfirmed == false)
             return null;
         return user;
     }
     private async Task SendRecoveryEmail(User user)
     {
-        if (user.Status == UserStatus.Blocked)
+        if (user.IsUserBlocked == true)
         {
             BlockedUserView();
             return;
         }
-        var callbackUrl = GenerateCallbackUrl(user);
-        string recoveryMessage = $"Please click the following link to recover your account: {callbackUrl}";
+        var recoveryUrl = await GenerateRecoveryUrlAsync(user);
+        string recoveryMessage = $"Please click the following link to recover your account: {recoveryUrl}";
         await emailSender.SendEmailAsync(user.Email, "The app Account recovery", recoveryMessage);
     }
 
-    private async Task<string> GenerateCallbackUrl(User user)
+    private async Task<string> GenerateRecoveryUrlAsync(User user)
     {
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
         var callbackUrl = Url.Page("ResetPassword", pageHandler: null,

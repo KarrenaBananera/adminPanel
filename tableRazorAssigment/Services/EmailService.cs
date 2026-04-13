@@ -36,6 +36,7 @@ public class EmailService : IEmailService
         client.EnableSsl = _settings.EnableSsl;
         client.Credentials = new NetworkCredential(_settings.Username, _settings.Password);
         client.UseDefaultCredentials = false;
+        client.DeliveryMethod = SmtpDeliveryMethod.Network;
         return client;
     }
 }

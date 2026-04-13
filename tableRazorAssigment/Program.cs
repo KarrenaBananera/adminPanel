@@ -26,10 +26,13 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton(ConfigureEmail());
+builder.Configuration.AddUserSecrets<Program>()
+    .AddEnvironmentVariables();
+
+builder.Services.AddSingleton(ConfigureEmail(builder.Configuration));
 builder.Services.AddScoped<SignInManager<User>, CustomSignInManager>();
 builder.Services.AddScoped<CustomSignInManager, CustomSignInManager>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddRazorPages();
 
@@ -56,15 +59,15 @@ app.MapRazorPages()
 
 app.Run();
 
-EmailSettings ConfigureEmail()
+EmailSettings ConfigureEmail(ConfigurationManager configuration)
 {
     return new EmailSettings
     {
-        Host = Environment.GetEnvironmentVariable("EMAIL_HOST") ?? "smtp.gmail.com",
-        Port = int.Parse(Environment.GetEnvironmentVariable("EMAIL_PORT") ?? "587"),
-        Username = Environment.GetEnvironmentVariable("EMAIL_USERNAME") ?? "",
-        Password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? "",
-        From = Environment.GetEnvironmentVariable("EMAIL_FROM") ?? "",
-        EnableSsl = bool.Parse(Environment.GetEnvironmentVariable("EMAIL_ENABLE_SSL") ?? "true")
+        Host = configuration["EMAIL_HOST"] ?? "smtp.gmail.com",
+        Port = int.Parse(configuration["EMAIL_PORT"] ?? "587"),
+        Username = configuration["EMAIL_USERNAME"] ?? "",
+        Password = configuration["EMAIL_PASSWORD"] ?? "",
+        From = configuration["EMAIL_FROM"] ?? "",
+        EnableSsl = bool.Parse(configuration["EMAIL_ENABLE_SSL"] ?? "true")
     };
 }

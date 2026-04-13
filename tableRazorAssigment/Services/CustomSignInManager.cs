@@ -23,7 +23,7 @@ public class CustomSignInManager : SignInManager<User>
         var user = await UserManager.FindByEmailAsync(email);
         if (user == null)
             return new CustomSignInResult { Succeeded = false};
-        if (user.Status == UserStatus.Blocked)
+        if (user.IsUserBlocked)
             return new CustomSignInResult { Succeeded = false, IsBlocked = true };
         var result = await PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         return new CustomSignInResult
