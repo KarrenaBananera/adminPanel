@@ -1,0 +1,43 @@
+﻿@page
+@model tableRazorAssigment.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<form method="post" class="max-width-600 container">
+    <h1>@ViewData["Title"]</h1>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div>
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" />
+    </div>
+
+    <div>
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" type="password" />
+    </div>
+
+    <div>
+        <label asp-for="Input.RememberMe">
+            <input asp-for="Input.RememberMe" />
+            @Html.DisplayNameFor(m => m.Input.RememberMe)
+        </label>
+    </div>
+
+    <button type="submit">Login</button>
+
+    <div class="login-space-between">
+        <div>
+            Don't have an account? <a asp-page="./Register">Sign in</a>
+        </div>
+        <div>
+            <a asp-page="/ForgotPassword">Forgot password?</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

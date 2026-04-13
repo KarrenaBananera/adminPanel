@@ -1,0 +1,45 @@
+body > header {
+    border-bottom: 1px solid var(--pico-muted-border-color);
+    padding-block: 0px;
+}
+
+.max-width-600
+{
+    max-width: 600px;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: #0172ad;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    margin: 0;
+}
+
+:root {
+    --pico-form-element-spacing-vertical: 0.7rem;   
+    --pico-form-element-spacing-horizontal: 0.75rem; 
+    --pico-font-size: 14px; 
+}
+
+.text-danger ul li {
+    font-weight: 600;
+    color: #b33;
+}
+
+.brand-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.brand-link:hover {
+    text-decoration: none;
+}
+
+.login-space-between {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}

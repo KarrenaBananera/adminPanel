@@ -1,0 +1,42 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<form method="post" class="max-width-600 container">
+    <h1>@ViewData["Title"]</h1>
+    @Html.AntiForgeryToken()    
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div>
+        <label asp-for="Input.UserName"></label>
+        <input placeholder="John Doe" asp-for="Input.UserName" />
+    </div>
+
+    <div>
+        <label asp-for="Input.UserTitle"></label>
+        <input placeholder="CFO, Meta Platforms, Inc" asp-for="Input.UserTitle" />
+    </div>
+
+    <div>
+        <label asp-for="Input.Email"></label>
+        <input placeholder="JohnDoe@email.com" asp-for="Input.Email" />
+    </div>
+
+    <div>
+        <label asp-for="Input.Password"></label>
+        <input placeholder="••••••••••" asp-for="Input.Password" type="password" />
+    </div>
+
+    <div>
+        <label asp-for="Input.ConfirmPassword"></label>
+        <input placeholder="••••••••••" asp-for="Input.ConfirmPassword" type="password" />
+    </div>
+
+    <button type="submit">Register</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
