@@ -18,7 +18,7 @@ public class CustomSignInManager : SignInManager<User>
     {
     }
 
-    public async Task<CustomSignInResult> CustomPasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure)
+    public async Task<CustomSignInResult> CustomSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure)
     {
         var user = await UserManager.FindByEmailAsync(email);
         if (user == null)

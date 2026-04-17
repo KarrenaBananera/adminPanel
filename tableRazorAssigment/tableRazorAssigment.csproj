@@ -8,14 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Index.cshtml.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Pages\Index.cshtml.css">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <Content Remove="wwwroot\js\api-service.js" />
+    <Content Remove="wwwroot\js\user-dto.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\api-service.js" />
+    <None Include="wwwroot\js\user-dto.js" />
+    <None Include="wwwroot\js\user-table-ui.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +24,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

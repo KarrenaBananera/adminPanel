@@ -1,17 +1,22 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
+using tableRazorAssigment.Data;
+using tableRazorAssigment.Model;
+using tableRazorAssigment.Services;
 
 namespace tableRazorAssigment.Pages;
 
 public class IndexModel : PageModel
 {
-
-    public IndexModel(ILogger<IndexModel> logger)
+    public IndexModel(UserManager<User> userManager)
     {
     }
 
-    public void OnGet()
+    public async Task<IActionResult> OnGet()
     {
-
+        return Page();
     }
+
 }

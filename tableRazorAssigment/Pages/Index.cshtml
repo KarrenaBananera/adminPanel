@@ -7,18 +7,70 @@
     ViewData["Title"] = "Home page";
 }
 
-
-
 @if (SignInManager.IsSignedIn(User))
 {
+    <main class="container-fluid" style="padding: 2rem 1.5rem;">
+        <!-- Панель: 4 кнопки + поле фильтрации в конце строки -->
+        <div class="action-bar">
+            <div class="btn-group" role="group" style="width:auto">
+                <button style="border-radius: 10px" class="btn-outline-blue" id="blockSelectedBtn" title="Block selected users">
+                    <i class="fas fa-lock"></i> Block
+                </button>
+                <button style="border-radius: 10px" class="btn-outline-blue btn-small" id="unblockSelectedBtn" title="Unblock selected users">
+                    <i class="fas fa-lock-open"></i>
+                </button>
+                <button style="border-radius: 10px" class="btn-outline-red btn-small" id="deleteSelectedBtn" title="Delete selected users">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <button style="border-radius: 10px" class="btn-outline-red btn-small" id="deleteNonVerifiedBtn" title="Delete non‑verified users">
+                    <i class="fas fa-broom"></i>
+                </button>
+            </div>
+            <input type="search" id="filterInput" class="filter-input" placeholder="Filter by name, email, status..." aria-label="Filter users">
+        </div>
 
+        <!-- Таблица пользователей -->
+        <div class="overflow-auto">
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th class="checkbox-col">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="selectAllCheckbox" title="Select / deselect all">
+                            </div>
+                        </th>
+                        <th class="sortable" data-column="Name">Name <i class="fas fa-sort" id="sortIcon-name"></i></th>
+                        <th class="sortable" data-column="Email">Email <i class="fas fa-sort" id="sortIcon-email"></i></th>
+                        <th class="sortable" data-column="Status">Status <i class="fas fa-sort" id="sortIcon-status"></i></th>
+                        <th class="sortable" data-column="LastSeen">Last seen <i class="fas fa-sort" id="sortIcon-lastSeen"></i></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Динамическое содержимое -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Пагинация -->
+        <div class="pagination-container" style="margin:10px">
+            <div class="pagination-controls">
+                <button id="prevPageBtn" class="btn-outline-blue btn-small" title="Previous page">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span id="pageInfo">Page 1</span>
+                <button id="nextPageBtn" class="btn-outline-blue btn-small" title="Next page">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
     @section Scripts {
-        <script src="Index.cshtml.js"></script>
+        <script type="module" src="~/js/main.js"></script>
     }
 }
 else
 {
-    <div class="">
+    <div>
         <h1 class="">Welcome</h1>
         <p>To use web application please log in</p>
     </div>

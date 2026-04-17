@@ -1,14 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿namespace tableRazorAssigment.Model;
 
-namespace tableRazorAssigment.Data;
-
-public class User : IdentityUser
+public class UserDto
 {
+    public string Id { get; set; }
+
     public string? Title { get; set; }
+
     public string Name { get; set; }
+
     public string UserEmail { get; set; }
+
     public bool IsUserBlocked { get; set; }
+
     public bool IsUserEmailConfirmed { get; set; }
+
     public DateTime LastSeen { get; set; }
 
 }

@@ -15,6 +15,18 @@ public class UserStatusMiddleware
         _next = next;
     }
 
+    public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
+    {
+        var userId = GetUserId(context);
+        if (userId is null)
+        {
+            await _next(context);
+            return;
+        }
+        await ScopeActionsAsync(userId, context, serviceProvider);
+        await _next(context);
+    }
+
     private string? GetUserId(HttpContext context)
     {
         if (context.User.Identity?.IsAuthenticated == false)
@@ -30,7 +42,24 @@ public class UserStatusMiddleware
         if (user is not null)
             return;
         await context.SignOutAsync(IdentityConstants.ApplicationScheme);
-        context.Response.Redirect("/Index");
+        if (CheckNotIndex(context))
+            context.Response.Redirect("/Index");
+    }
+
+    private async Task LogOutBlockedUser(User? user, HttpContext context)
+    {
+        if (user is null || user.IsUserBlocked == false)
+            return;
+        await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+    }
+
+    private bool CheckNotIndex(HttpContext context)
+    {
+        if (context.Request.Path.Equals("/Index", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+        return true;
     }
 
     private async Task UpdateLastSeen(User? user, UserManager<User> userManager)
@@ -41,18 +70,6 @@ public class UserStatusMiddleware
         user.LastSeen = now;
         await userManager.UpdateAsync(user);
         return;
-    }
-
-    public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
-    {
-        var userId = GetUserId(context);
-        if (userId is null)
-        {
-            await _next(context);
-            return;
-        }
-        await ScopeActionsAsync(userId, context, serviceProvider);
-        await _next(context);
     }
 
     private async Task ScopeActionsAsync(string userId, HttpContext context, IServiceProvider serviceProvider)

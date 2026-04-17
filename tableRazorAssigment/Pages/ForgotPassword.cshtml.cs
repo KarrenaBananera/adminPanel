@@ -9,10 +9,8 @@ using tableRazorAssigment.Services;
 
 namespace tableRazorAssigment.Pages;
 
-public class ForgotPasswordModel : GuestOnlyPage
-{
-    private readonly UserManager<User> _userManager;
-    private readonly IEmailService emailSender;
+public class ForgotPasswordModel : GuestOnlyPage {
+    private readonly IPasswordRecoveryService _recoveryService;
 
     public class InputModel
     {
@@ -22,10 +20,9 @@ public class ForgotPasswordModel : GuestOnlyPage
         public string Email { get; set; }
     }
 
-    public ForgotPasswordModel(UserManager<User> userManager, IEmailService emailSender)
+    public ForgotPasswordModel(IPasswordRecoveryService recoveryService)
     {
-        _userManager = userManager;
-        this.emailSender = emailSender;
+        _recoveryService = recoveryService;
     }
 
     [BindProperty]
@@ -36,38 +33,12 @@ public class ForgotPasswordModel : GuestOnlyPage
         if (!ModelState.IsValid)
             return Page();
         ViewData["SuccessMessage"] = $"Recovery link was send on your email.";
-        var user = await GetValidUserAsync();
-        if (user is not null)
-            await SendRecoveryEmail(user);
+        var result = await _recoveryService.SendRecoveryEmailAsync(Input.Email);
+        if (result == RecoveryResult.UserBlocked)
+            BlockedUserView();
         return Page();
     }
 
-    private async Task<User?> GetValidUserAsync()
-    {
-        var user = await _userManager.FindByEmailAsync(Input.Email);
-        if (user == null || user.IsUserEmailConfirmed == false)
-            return null;
-        return user;
-    }
-    private async Task SendRecoveryEmail(User user)
-    {
-        if (user.IsUserBlocked == true)
-        {
-            BlockedUserView();
-            return;
-        }
-        var recoveryUrl = await GenerateRecoveryUrlAsync(user);
-        string recoveryMessage = $"Please click the following link to recover your account: {recoveryUrl}";
-        await emailSender.SendEmailAsync(user.Email, "The app Account recovery", recoveryMessage);
-    }
-
-    private async Task<string> GenerateRecoveryUrlAsync(User user)
-    {
-        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var callbackUrl = Url.Page("ResetPassword", pageHandler: null,
-           new { userId = user.Id, code = code }, protocol: Request.Scheme);
-        return callbackUrl;
-    }
     private void BlockedUserView()
     {
         ViewData["ErrorMessage"] = $"Your account is blocked";

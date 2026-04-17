@@ -20,8 +20,8 @@ public class EmailConfirmationModel : PageModel
         {
             return RedirectToPage("Index");
         }
-        var result = await ConfirmEmailAsync(userId, code);
-        if (result is null || result.Succeeded == false)
+        var identityResult = await ConfirmEmailAsync(userId, code);
+        if (identityResult is null || identityResult.Succeeded == false)
         {
             ViewData["Error"] = "Something went wrong";
         }
@@ -33,9 +33,9 @@ public class EmailConfirmationModel : PageModel
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
             return null;
-        var result = await _userManager.ConfirmEmailAsync(user, code);
-        await OnSuccsessConfirm(user, result);
-        return result;
+        var identityResult = await _userManager.ConfirmEmailAsync(user, code);
+        await OnSuccsessConfirm(user, identityResult);
+        return identityResult;
     }
 
     private async Task OnSuccsessConfirm(User user, IdentityResult? result)

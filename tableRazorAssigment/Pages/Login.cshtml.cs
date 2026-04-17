@@ -45,7 +45,7 @@ public class LoginModel : GuestOnlyPage
     {
         if (!ModelState.IsValid)
             return Page();
-        var result = await _signInManager.CustomPasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+        var result = await _signInManager.CustomSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
         if (result is not null && result.Succeeded)
             return RedirectToPage("Index");
         AddModelErrors(result);

@@ -10,8 +10,7 @@ namespace tableRazorAssigment.Pages;
 
 public class ResetPasswordModel : PageModel
 {
-    private readonly CustomSignInManager _signInManager;
-    private readonly UserManager<User> _userManager;
+    private readonly IPasswordRecoveryService passwordRecovery;
 
     [BindProperty]
     public InputModel Input { get; set; }
@@ -37,16 +36,18 @@ public class ResetPasswordModel : PageModel
         public string ConfirmPassword { get; set; }
     }
 
-    public ResetPasswordModel(CustomSignInManager signInManager, UserManager<User> userManager)
+    public ResetPasswordModel(IPasswordRecoveryService passwordRecovery)
     {
-        _signInManager = signInManager;
-        _userManager = userManager;
+        this.passwordRecovery = passwordRecovery;
     }
 
     public async Task<IActionResult> OnGet(string? userId, string? code)
     {
-       if (IsRequestValid(userId, code) == false || IsRequestValid(userId, code) == false)
-            return RedirectToPage("Index");
+        if (await IsRequestValid(userId, code) == false)
+        {
+            ViewData["Error"] = "Something went wrong";
+            return Page();
+        }
         Input = new InputModel
         {
             UserId = userId,
@@ -55,21 +56,7 @@ public class ResetPasswordModel : PageModel
         return Page();
     }
 
-    private async Task<bool> IsUserTokenValid(string userId, string code)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user is null)
-            return false;
-        var isValid = await _userManager.VerifyUserTokenAsync(
-             user,
-             _userManager.Options.Tokens.PasswordResetTokenProvider,
-             "ResetPassword",
-             code
-         );
-        return isValid;
-    }
-
-    private bool IsRequestValid(string? userId, string? code)
+    private async Task<bool> IsRequestValid(string? userId, string? code)
     {
         if (User.Identity is not null && User.Identity.IsAuthenticated)
             return false;
@@ -82,7 +69,7 @@ public class ResetPasswordModel : PageModel
     {
         if (!ModelState.IsValid)
             return Page();
-        var result = await ResetUserPassword();
+        var result = await passwordRecovery.RecoverAccountAsync(Input.UserId, Input.Code, Input.NewPassword);
         if (result is not null && result.Succeeded)
             return RedirectToPage("Index");
         AddErrorsToView(result);
@@ -96,24 +83,6 @@ public class ResetPasswordModel : PageModel
         foreach (var error in result.Errors)
         {
             ModelState.AddModelError(string.Empty, error.Description);
-        }
-    }
-
-    private async Task<IdentityResult?> ResetUserPassword()
-    {
-        var user = await _userManager.FindByIdAsync(Input.UserId);
-        if (user is null)
-            return null;
-        var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.NewPassword);
-        await OnSuccessResult(result, user);
-        return result;
-    }
-
-    private async Task OnSuccessResult(IdentityResult? result, User user)
-    {
-        if (result is not null && result.Succeeded)
-        {
-            await _signInManager.CustomPasswordSignInAsync(user.Email, Input.NewPassword, true, false);
         }
     }
 

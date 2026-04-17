@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using System.ComponentModel.DataAnnotations;
 using tableRazorAssigment.Data;
 using tableRazorAssigment.Pages.Shared;
@@ -14,18 +15,11 @@ namespace tableRazorAssigment.Pages;
 
 public class RegisterModel : GuestOnlyPage
 {
-    private readonly UserManager<User> _userManager;
-    private readonly SignInManager<User> _signInManager;
-    private readonly IEmailService emailSender;
+    private readonly IUserRegisterService _registerService;
 
-    public RegisterModel(
-        UserManager<User> userManager,
-        SignInManager<User> signInManager,
-        IEmailService emailSender)
+    public RegisterModel(IUserRegisterService registerService)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        this.emailSender = emailSender;
+        _registerService = registerService;
     }
 
     [BindProperty]
@@ -80,36 +74,14 @@ public class RegisterModel : GuestOnlyPage
     {
         if (!ModelState.IsValid)
             return Page();
-        var result = await CreateUser();
+        var user = ConstructUser();
+        var result = await _registerService.RegisterUserAsync(user, Input.Password);
         if (CheckInvalidCreate(result))
             return Page();
         return RedirectToPage("Index");
     }
 
-    private async Task<IdentityResult> CreateUser()
-    {
-        var user = ConstructUser();
-        await CheckExistingUser(user);
-        var result = await _userManager.CreateAsync(user, Input.Password);
-        await OnUserCreation(result, user);
-        return result;
-    }
-
-    private async Task CheckExistingUser(User user)
-    { 
-        var existenUser = await _userManager.FindByEmailAsync(user.Email);
-        if (existenUser is not null)
-            await DeleteUnverifiedUser(existenUser);
-    }
-
-    private async Task DeleteUnverifiedUser(User user)
-    { 
-        if (user.IsUserEmailConfirmed == false)
-        {
-            await _userManager.DeleteAsync(user);
-        }
-    }
-    private bool CheckInvalidCreate(IdentityResult result)
+    private bool CheckInvalidCreate(IdentityResult? result)
     {
         if (result is null || result.Succeeded == false)
         {
@@ -122,30 +94,6 @@ public class RegisterModel : GuestOnlyPage
     private void OnInvalidCreate(IdentityResult result)
     {
         ModelState.AddModelError(Input.Email, "This email already exist");
-    }
-
-    private async Task OnUserCreation(IdentityResult result, User user)
-    {
-        if (result.Succeeded)
-        {
-            await _signInManager.SignInAsync(user, isPersistent: true);
-            await SendEmailConformation(user);
-        }
-    }
-
-    private async Task SendEmailConformation(User user)
-    {
-        var callbackUrl = await GenerateConfirmationLink(user);
-        string recoveryMessage = $"Please click the following link to confirm your email:\n{callbackUrl} \n\n Ignore this message if its not your account";
-        await emailSender.SendEmailAsync(user.Email, "The app email confirmation", recoveryMessage);
-    }
-
-    private async Task<string> GenerateConfirmationLink(User user)
-    {
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var callbackUrl = Url.Page("EmailConfirmation", pageHandler: null,
-           new { userId = user.Id, code = code }, protocol: Request.Scheme);
-        return callbackUrl;
     }
 
 }
