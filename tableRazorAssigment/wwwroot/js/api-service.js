@@ -113,7 +113,7 @@ export class ApiService {
             item.userEmail,
             item.isUserBlocked,
             item.isUserEmailConfirmed,
-            item.lastSeen,
+            new Date(item.lastSeen + 'Z'),
             item.title
         );
     }
