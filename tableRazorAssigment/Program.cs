@@ -77,6 +77,12 @@ app.UseMiddleware<LogOutInvalidUserMiddleware>();
 app.MapRazorPages()
    .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 app.Run();
 
 EmailSettings ConfigureEmail(ConfigurationManager configuration)

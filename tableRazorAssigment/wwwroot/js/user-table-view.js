@@ -176,7 +176,6 @@ export class UserTableView {
         this.elements.deleteSelectedBtn.addEventListener('click', async () => {
             const ids = this.getSelectedUserIds();
             if (ids.length === 0) return;
-            if (!confirm(`Delete ${ids.length} user(s)?`)) return;
             await this.model.deleteUsers(ids);
         });
     }
@@ -184,12 +183,7 @@ export class UserTableView {
     initDeleteNonVerifiedListener() {
         this.elements.deleteNonVerifiedBtn.addEventListener('click', async () => {
             const selectedIds = this.getSelectedUserIds();
-            if (selectedIds.length === 0) return;
-            const nonVerifiedIds = this.model.users
-                .filter(u => selectedIds.includes(u.id) && u.status === 'Not verified')
-                .map(u => u.id);
-            if (nonVerifiedIds.length === 0) return;
-            if (!confirm(`Delete ${nonVerifiedIds.length} non‑verified user(s)?`)) return;
+            if (selectedIds.length === 0) return
             await this.model.clearNonVerifiedUsers(selectedIds);
         });
     }
