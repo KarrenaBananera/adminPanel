@@ -5,6 +5,7 @@ export class UserDto {
         this.userEmail = userEmail;
         this.isUserBlocked = isUserBlocked;
         this.isUserEmailConfirmed = isUserEmailConfirmed;
+        this.lastSeen += 'Z';
         this.lastSeen = lastSeen instanceof Date ? lastSeen : new Date(lastSeen);
         this.title = title;
     }

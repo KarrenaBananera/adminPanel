@@ -1,4 +1,4 @@
-﻿import { UserTableUI } from './user-table-ui.js';
+﻿import { UserTableView } from './user-table-view.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const elements = {
@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         prevPageBtn: document.getElementById('prevPageBtn'),
         nextPageBtn: document.getElementById('nextPageBtn'),
-        pageInfo: document.getElementById('pageInfo')
+        pageInfo: document.getElementById('pageInfo'),
+        selectedCountDisplay: document.getElementById('selectedCountDisplay') 
     };
 
-    new UserTableUI(elements);
+    new UserTableView(elements);
 });

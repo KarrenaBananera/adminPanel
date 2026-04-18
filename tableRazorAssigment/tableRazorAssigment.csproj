@@ -15,7 +15,7 @@
   <ItemGroup>
     <None Include="wwwroot\js\api-service.js" />
     <None Include="wwwroot\js\user-dto.js" />
-    <None Include="wwwroot\js\user-table-ui.js" />
+    <None Include="wwwroot\js\user-table-view.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,10 +24,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

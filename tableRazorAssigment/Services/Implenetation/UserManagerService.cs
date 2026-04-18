@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using tableRazorAssigment.Data;
 
-namespace tableRazorAssigment.Services;
+namespace tableRazorAssigment.Services.Implenetation;
 
 public class UserManagerService : IUserManagerService
 {

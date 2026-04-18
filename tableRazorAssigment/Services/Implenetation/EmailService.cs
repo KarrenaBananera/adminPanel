@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Mail;
 using tableRazorAssigment.Configuration;
 
-namespace tableRazorAssigment.Services;
+namespace tableRazorAssigment.Services.Implenetation;
 
 public class EmailService : IEmailService
 {

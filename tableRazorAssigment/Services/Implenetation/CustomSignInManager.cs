@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using tableRazorAssigment.Data;
 
-namespace tableRazorAssigment.Services;
+namespace tableRazorAssigment.Services.Implenetation;
 
 public class CustomSignInManager : SignInManager<User>
 {

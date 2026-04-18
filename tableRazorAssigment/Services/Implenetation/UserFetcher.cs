@@ -2,7 +2,7 @@
 using tableRazorAssigment.Data;
 using tableRazorAssigment.Model;
 
-namespace tableRazorAssigment.Services;
+namespace tableRazorAssigment.Services.Implenetation;
 
 public class UserFetcher : IUserFetcher
 {
@@ -42,9 +42,9 @@ public class UserFetcher : IUserFetcher
             return query;
         var searchTermLower = parameters.SearchTerm.Trim().ToLower();
         query = query.Where(u =>
-            (u.Name != null && u.Name.ToLower().Contains(searchTermLower)) ||
-            (u.UserEmail != null && u.UserEmail.ToLower().Contains(searchTermLower)) ||
-            (u.Title != null && u.Title.ToLower().Contains(searchTermLower))
+            u.Name != null && u.Name.ToLower().Contains(searchTermLower) ||
+            u.UserEmail != null && u.UserEmail.ToLower().Contains(searchTermLower) ||
+            u.Title != null && u.Title.ToLower().Contains(searchTermLower)
         );
         return query;
     }

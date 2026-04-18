@@ -1,10 +1,12 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using tableRazorAssigment.Data;
 using tableRazorAssigment.Pages;
 
-namespace tableRazorAssigment.Services;
+namespace tableRazorAssigment.Services.Implenetation;
 
 public class UserRegisterService : IUserRegisterService
 {
@@ -46,10 +48,24 @@ public class UserRegisterService : IUserRegisterService
     }
     private async Task<IdentityResult?> CreateUserAsync(User user, string passowrd)
     {
-        await CheckExistingUser(user);
+        IdentityResult? identityResult = null;
         user.LastSeen = DateTime.UtcNow;
-        var identityResult = await _userManager.CreateAsync(user, passowrd);
-        await OnUserCreation(identityResult, user);
+        try
+        {
+            identityResult = await _userManager.CreateAsync(user, passowrd);
+            await OnUserCreation(identityResult, user);
+        }
+        catch (DbUpdateException ex)
+        {
+            if (IsUniqueIndexViolation(ex))
+            {
+                var error = new IdentityError
+                {
+                    Code = "DuplicateUser"
+                };
+                identityResult = IdentityResult.Failed(error);
+            }
+        }
         return identityResult;
     }
 
@@ -93,10 +109,20 @@ public class UserRegisterService : IUserRegisterService
             httpContext,
             page: "EmailConfirmation",
             handler: null,
-            values: new { userId = user.Id, code = code },
+            values: new { userId = user.Id, code },
             scheme: httpContext.Request.Scheme,
             host: httpContext.Request.Host);
         return callbackUrl;
+    }
+
+    private bool IsUniqueIndexViolation(DbUpdateException ex)
+    {
+        var sqlEx = ex.GetBaseException() as SqlException;
+        if (sqlEx != null)
+        {
+            return sqlEx.Number == 2601 || sqlEx.Number == 2627;
+        }
+        return false;
     }
 
 }

@@ -6,6 +6,7 @@ using tableRazorAssigment.Configuration;
 using tableRazorAssigment.Data;
 using tableRazorAssigment.Middleware;
 using tableRazorAssigment.Services;
+using tableRazorAssigment.Services.Implenetation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,18 +14,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Events = new CookieAuthenticationEvents
-        {
-            OnRedirectToLogin = context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return Task.CompletedTask;
-            }
-        };
-    });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddHttpContextAccessor();
@@ -40,6 +29,16 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login";
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+});
+
 builder.Configuration.AddUserSecrets<Program>()
     .AddEnvironmentVariables();
 
@@ -51,6 +50,8 @@ builder.Services.AddScoped<IUserRegisterService, UserRegisterService>();
 builder.Services.AddScoped<IPasswordRecoveryService, PasswordRecoveryService>();
 builder.Services.AddScoped<IUserFetcher, UserFetcher>();
 builder.Services.AddScoped<IUserManagerService, UserManagerService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 
 builder.Services.AddRazorPages();
 
@@ -68,10 +69,11 @@ else
 app.UseRouting();
 
 app.UseAuthentication();
-app.UseMiddleware<UserStatusMiddleware>();
-app.UseAuthorization();
-
 app.MapStaticAssets();
+app.UseMiddleware<UserLastSeenMiddleware>();
+app.UseAuthorization();
+app.UseMiddleware<LogOutInvalidUserMiddleware>();
+
 app.MapRazorPages()
    .WithStaticAssets();
 

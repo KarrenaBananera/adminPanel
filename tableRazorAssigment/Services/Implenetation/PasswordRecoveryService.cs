@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using tableRazorAssigment.Data;
 using tableRazorAssigment.Pages.Shared;
-using tableRazorAssigment.Services;
 
-namespace tableRazorAssigment.Services;
+namespace tableRazorAssigment.Services.Implenetation;
 
 public class PasswordRecoveryService : IPasswordRecoveryService
 {
@@ -43,13 +42,12 @@ public class PasswordRecoveryService : IPasswordRecoveryService
     private async Task<User?> GetValidUserAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
-        if (user == null 
-        || user.IsUserEmailConfirmed == false)
+        if (user == null)
             return null;
         return user;
     }
 
-    public async Task<string> GenerateRecoveryUrlAsync(User user)
+    private async Task<string> GenerateRecoveryUrlAsync(User user)
     {
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
         var httpContext = _httpContextAccessor.HttpContext
@@ -58,7 +56,7 @@ public class PasswordRecoveryService : IPasswordRecoveryService
             httpContext,
             page: "/ResetPassword",       
             handler: null,
-            values: new { userId = user.Id, code = code },
+            values: new { userId = user.Id, code },
             scheme: httpContext.Request.Scheme,
             host: httpContext.Request.Host);
         return callbackUrl;
@@ -76,17 +74,19 @@ public class PasswordRecoveryService : IPasswordRecoveryService
 
     private async Task<IdentityResult?> ResetUserPasswordAsync(User user, string code, string password)
     {
-        var result = await _userManager.ResetPasswordAsync(user, code, password);
-        if (result is not null && result.Succeeded)
+        var identityResult = await _userManager.ResetPasswordAsync(user, code, password);
+        if (identityResult is not null && identityResult.Succeeded)
         {
-            await OnSuccessResult(result, user, password);
+            await OnSuccessResult(identityResult, user, password);
         }
-        return result;
+        return identityResult;
     }
 
     private async Task OnSuccessResult(IdentityResult? result, User user, string password)
     {
         await _signInManager.CustomSignInAsync(user.Email, password, true, false);
+        user.IsUserEmailConfirmed = true;
+        await _userManager.UpdateAsync(user);
     }
 
     private async Task<bool> IsUserTokenValidAsync(User user, string code)

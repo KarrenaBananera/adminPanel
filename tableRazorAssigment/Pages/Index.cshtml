@@ -10,7 +10,6 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <main class="container-fluid" style="padding: 2rem 1.5rem;">
-        <!-- Панель: 4 кнопки + поле фильтрации в конце строки -->
         <div class="action-bar">
             <div class="btn-group" role="group" style="width:auto">
                 <button style="border-radius: 10px" class="btn-outline-blue" id="blockSelectedBtn" title="Block selected users">
@@ -23,13 +22,12 @@
                     <i class="fas fa-trash-alt"></i>
                 </button>
                 <button style="border-radius: 10px" class="btn-outline-red btn-small" id="deleteNonVerifiedBtn" title="Delete non‑verified users">
-                    <i class="fas fa-broom"></i>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </button>
             </div>
             <input type="search" id="filterInput" class="filter-input" placeholder="Filter by name, email, status..." aria-label="Filter users">
         </div>
 
-        <!-- Таблица пользователей -->
         <div class="overflow-auto">
             <table class="striped">
                 <thead>
@@ -46,14 +44,16 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Динамическое содержимое -->
                 </tbody>
             </table>
         </div>
 
-        <!-- Пагинация -->
-        <div class="pagination-container" style="margin:10px">
-            <div class="pagination-controls">
+        <div class="pagination-container">
+            <div style="margin-top: 5px; font-size: 0.9rem;">
+                <span id="selectedCountDisplay">Selected: 0</span>
+            </div>
+
+            <div class="pagination-controls" style="margin-top: 5px">
                 <button id="prevPageBtn" class="btn-outline-blue btn-small" title="Previous page">
                     <i class="fas fa-chevron-left"></i>
                 </button>

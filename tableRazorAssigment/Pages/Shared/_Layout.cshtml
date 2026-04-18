@@ -4,7 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - tableRazorAssigment</title>
-    <script type="importmap"></script>
+    <script type="importmap">
+          {
+            "imports": {
+                "date-fns": "https://cdn.jsdelivr.net/npm/date-fns@4.1.0/index.js"
+            }
+        }
+    </script>
     <link rel="stylesheet" href="~/lib/picocss/pico.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/tableRazorAssigment.styles.css" asp-append-version="true" />
@@ -25,9 +31,9 @@
     <main class="container">
         @RenderBody()
     </main>
-
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/site.js" asp-append-version="true"></script>
 </body>
 </html>

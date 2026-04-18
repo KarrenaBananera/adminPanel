@@ -1,4 +1,4 @@
-﻿namespace tableRazorAssigment.Services;
+﻿namespace tableRazorAssigment.Services.Implenetation;
 
 public class CustomSignInResult
 {
