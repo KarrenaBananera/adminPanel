@@ -15,6 +15,7 @@ export class UserTableModel {
         };
         this._listeners = [];
         this._searchDebounceTimer = null;
+        this.currentUser = null;
     }
     get users() { return this._state.users; }
     get totalCount() { return this._state.totalCount; }
@@ -46,6 +47,11 @@ export class UserTableModel {
             const response = await this.apiService.fetchUsers(params);
             this._state.users = response.items;
             this._state.totalCount = response.totalCount;
+            if (this.currentUser == undefined) {
+                let tempUser = await this.apiService.getCurrentUser();
+                this.currentUser = tempUser.id;
+            }
+
         } catch (error) {
             if (error && error.status === 401) {
                 window.location.href = '/Login';

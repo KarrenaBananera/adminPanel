@@ -151,7 +151,7 @@ export class UserTableView {
         this.elements.tbody.addEventListener('change', (e) => {
             if (e.target.classList.contains('row-checkbox')) {
                 this.updateSelectAllState();
-                this.updateSelectedCount(); 
+                this.updateSelectedCount();
             }
         });
     }
@@ -160,7 +160,16 @@ export class UserTableView {
         this.elements.blockBtn.addEventListener('click', async () => {
             const ids = this.getSelectedUserIds();
             if (ids.length === 0) return;
-            await this.model.blockUsers(ids);
+            if (!this.isContainsCurrentUser(ids))
+                await this.model.blockUsers(ids);
+            else {
+                var confirmed = await this.showConfirmDialog(ids, 'Are you sure you want block');
+                if (confirmed)
+                {
+                    await this.model.blockUsers(ids);
+                    window.location.href = '/Login';
+                }
+            }
         });
     }
 
@@ -176,7 +185,12 @@ export class UserTableView {
         this.elements.deleteSelectedBtn.addEventListener('click', async () => {
             const ids = this.getSelectedUserIds();
             if (ids.length === 0) return;
-            await this.model.deleteUsers(ids);
+            var confirmed = await this.showConfirmDialog(ids, 'Are you sure you want delete');
+            if (confirmed) {
+                await this.model.deleteUsers(ids);
+                if (this.isContainsCurrentUser(ids))
+                    window.location.href = '/Login';
+            }
         });
     }
 
@@ -184,7 +198,12 @@ export class UserTableView {
         this.elements.deleteNonVerifiedBtn.addEventListener('click', async () => {
             const selectedIds = this.getSelectedUserIds();
             if (selectedIds.length === 0) return
-            await this.model.clearNonVerifiedUsers(selectedIds);
+            var confirmed = await this.showConfirmDialog(selectedIds, 'Are you sure you want delete');
+            if (confirmed) {
+                await this.model.clearNonVerifiedUsers(selectedIds);
+                if (this.isContainsCurrentUser(selectedIds))
+                    window.location.href = '/Login';
+            }
         });
     }
 
@@ -193,6 +212,45 @@ export class UserTableView {
         if (this.elements.selectedCountDisplay) {
             this.elements.selectedCountDisplay.textContent = `Selected: ${selectedCount}`;
         }
+    }
+
+    createConfirmDialog(message) {
+        return new Promise((resolve) => {
+            const dialog = document.getElementById('confirmDialog');
+            const messageSpan = document.getElementById('confirmDialogMessage');
+            const cancelBtn = document.getElementById('confirmDialogCancelBtn');
+            const confirmBtn = document.getElementById('confirmDialogOkBtn');
+
+            messageSpan.textContent = message;
+
+            const cleanup = (result) => {
+                dialog.close();
+                cancelBtn.removeEventListener('click', onCancel);
+                confirmBtn.removeEventListener('click', onConfirm);
+                dialog.removeEventListener('cancel', onCancel);
+                resolve(result);
+            };
+
+            const onCancel = () => cleanup(false);
+            const onConfirm = () => cleanup(true);
+
+            cancelBtn.addEventListener('click', onCancel);
+            confirmBtn.addEventListener('click', onConfirm);
+            dialog.addEventListener('cancel', onCancel);
+
+            dialog.showModal();
+        });
+    }
+
+    async showConfirmDialog(ids, message) {
+        let deleteMessage = message + ' this users';
+        if (this.isContainsCurrentUser(ids))
+            deleteMessage = message + ' yourself';
+        return await this.createConfirmDialog(deleteMessage);
+    }
+
+    isContainsCurrentUser(users) {
+        return users.indexOf(this.model.currentUser) !== -1;
     }
 
 }

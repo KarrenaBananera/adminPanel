@@ -83,6 +83,7 @@ using (var scope = app.Services.CreateScope())
     await dbContext.Database.MigrateAsync();
 }
 
+
 app.Run();
 
 EmailSettings ConfigureEmail(ConfigurationManager configuration)

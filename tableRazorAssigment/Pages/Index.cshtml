@@ -63,6 +63,19 @@
                 </button>
             </div>
         </div>
+
+        <dialog id="confirmDialog" class="dialog">
+    <article>
+        <header>
+            <strong id="confirmDialogTitle">Action conformation</strong>
+        </header>
+        <p id="confirmDialogMessage">Confirm your action</p>
+        <footer style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button id="confirmDialogCancelBtn" class="btn">Cancel</button>
+            <button id="confirmDialogOkBtn" class="btn btn-primary">Confirm</button>
+        </footer>
+    </article>
+</dialog>
     </main>
     @section Scripts {
         <script type="module" src="~/js/main.js"></script>

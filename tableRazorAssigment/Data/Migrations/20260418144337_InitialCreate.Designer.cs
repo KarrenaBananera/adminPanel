@@ -12,7 +12,7 @@ using tableRazorAssigment.Data;
 namespace tableRazorAssigment.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260413185819_InitialCreate")]
+    [Migration("20260418144337_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -191,6 +191,11 @@ namespace tableRazorAssigment.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(260)
+                        .HasColumnType("nvarchar(260)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)

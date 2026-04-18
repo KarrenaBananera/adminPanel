@@ -7,10 +7,20 @@ namespace tableRazorAssigment.Services.Implenetation;
 public class UserFetcher : IUserFetcher
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UserFetcher(ApplicationDbContext dbContext)
+    public UserFetcher(ApplicationDbContext dbContext, ICurrentUserService currentUserService)
     {
         _dbContext = dbContext;
+        _currentUserService = currentUserService;
+    }
+
+    public async Task<UserDto?> GetCurrentUserAsync(HttpContext context)
+    {
+        var user = await _currentUserService.GetCurrentUserAsync(context);
+        if (user is null)
+            return null;
+        return ToUserDto(user);
     }
 
     public async Task<List<UserDto>> FetchUsersAsync(UserQueryParameters parameters)
@@ -75,7 +85,6 @@ public class UserFetcher : IUserFetcher
                          .ThenBy(u => u.IsUserEmailConfirmed);
         return query;
     }
-
     private IQueryable<User> SortByLastSeen(IQueryable<User> query, bool descending)
     {
         return descending ? query.OrderByDescending(u => u.LastSeen) : query.OrderBy(u => u.LastSeen);
@@ -100,16 +109,21 @@ public class UserFetcher : IUserFetcher
 
     private IQueryable<UserDto> ToUserDto(IQueryable<User> query, UserQueryParameters parameters)
     {
-        return query.Select(u => new UserDto
+        return query.Select(u => ToUserDto(u));
+    }
+
+    private static UserDto ToUserDto(User user)
+    {
+        return new UserDto
         {
-            Id = u.Id,
-            Title = u.Title,
-            Name = u.Name,
-            UserEmail = u.UserEmail,
-            IsUserBlocked = u.IsUserBlocked,
-            IsUserEmailConfirmed = u.IsUserEmailConfirmed,
-            LastSeen = u.LastSeen
-        });
+            Id = user.Id,
+            Title = user.Title,
+            Name = user.Name,
+            UserEmail = user.UserEmail,
+            IsUserBlocked = user.IsUserBlocked,
+            IsUserEmailConfirmed = user.IsUserEmailConfirmed,
+            LastSeen = user.LastSeen
+        };
     }
 
 }

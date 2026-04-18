@@ -26,6 +26,13 @@ export class ApiService {
         await this._postWithHandler('DeleteUnverified', ids);
     }
 
+    async getCurrentUser() {
+        const url = `${ApiService.API_BASE}?handler=CurrentUser`;
+        const data = await this._get(url);
+        var user = this._mapUser(data.item);
+        return user;
+    }
+
     static _getAntiForgeryToken() {
         const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
         return tokenElement?.value ?? '';
@@ -95,7 +102,12 @@ export class ApiService {
     }
 
     _mapUserListResponse(data) {
-        const items = data.items.map(item => new UserDto(
+        const items = data.items.map(item => this._mapUser(item));
+        return { ...data, items };
+    }
+
+    _mapUser(item) {
+        return new UserDto(
             item.id,
             item.name,
             item.userEmail,
@@ -103,7 +115,6 @@ export class ApiService {
             item.isUserEmailConfirmed,
             item.lastSeen,
             item.title
-        ));
-        return { ...data, items };
+        );
     }
 }

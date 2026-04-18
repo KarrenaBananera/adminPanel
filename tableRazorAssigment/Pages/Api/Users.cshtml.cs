@@ -21,7 +21,6 @@ public class UsersModel : PageModel
         _userFetcher = userFetcher;
         _userManagerService = userManagerService;
         _userManager = userManager;
-
     }
 
     public async Task<IActionResult> OnGet(UserQueryParameters parameters)
@@ -35,6 +34,15 @@ public class UsersModel : PageModel
             PageNumber = parameters.PageNumber,
             PageSize = parameters.PageSize,
             TotalPages = (int)Math.Ceiling(totalCount / (double)parameters.PageSize)
+        });
+    }
+
+    public async Task<IActionResult> OnGetCurrentUser()
+    {
+        var user = await _userFetcher.GetCurrentUserAsync(HttpContext);
+        return new JsonResult(new
+        {
+            Item = user
         });
     }
 
