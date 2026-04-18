@@ -29,10 +29,14 @@ public class RegisterModel : GuestOnlyPage
     {
         [Required(ErrorMessage = "Specify User name")]
         [Display(Name = "Name")]
+        [RegularExpression(@"^[a-zA-Z0-9\s\-_\.!?@#\$%&*()+=:;',\""]*$",
+         ErrorMessage = "Name contains invalid characters.")]
         [MaxLength(256)]
         public string UserName { get; set; }
 
         [Display(Name = "Your title")]
+        [RegularExpression(@"^[a-zA-Z0-9\s\-_\.!?@#\$%&*()+=:;',\""]*$",
+        ErrorMessage = "Title contains invalid characters.")]
         [MaxLength(200)]
         public string? UserTitle { get; set; }
 
